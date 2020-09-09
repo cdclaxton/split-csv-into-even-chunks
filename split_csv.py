@@ -4,6 +4,7 @@ import numpy as np
 import os
 
 
+# Increase the maximum field size to handle large files
 csv.field_size_limit(10000000)
 
 
@@ -21,6 +22,8 @@ def calc_doc_lengths(filepath, delimiter, encapsulator):
 
     # Preconditions
     assert os.path.exists(filepath), f"File doesn't exist: {filepath}"
+    assert isinstance(delimiter, str)
+    assert isinstance(encapsulator, str)
 
     # List of the lengths of each document
     doc_lengths = []
@@ -34,7 +37,7 @@ def calc_doc_lengths(filepath, delimiter, encapsulator):
             doc_lengths.append(calc_length(row))
             num_rows_read += 1
 
-    print(f"Read {num_rows_read} rows")
+    print(f"Read {num_rows_read} rows from {filepath}")
 
     return doc_lengths
 
@@ -113,7 +116,7 @@ class BatchedCsvWriter:
         # Preconditions
         assert isinstance(row, list)
 
-        # Start a new file this is the first row
+        # Start a new file if this is the first row
         if self.fp is None:
             self.start_new_file()
 
@@ -122,7 +125,8 @@ class BatchedCsvWriter:
     def close(self):
         """Close the file."""
 
-        self.fp.close()
+        if self.fp is not None:
+            self.fp.close()
 
 
 def split(filepath, delimiter, encapsulator, output_folder, prefix, cuts):
@@ -158,6 +162,7 @@ def split(filepath, delimiter, encapsulator, output_folder, prefix, cuts):
 
             writer.add_row(row)
 
+        print(f"Read {num_rows_read} data rows from {filepath}")
         writer.close()
 
 
@@ -166,6 +171,7 @@ def plot_doc_lengths(doc_lengths):
 
     # Preconditions
     assert isinstance(doc_lengths, list)
+    assert len(doc_lengths) > 0
 
     plt.plot(doc_lengths)
     plt.xlabel("Document index")
@@ -178,7 +184,9 @@ def plot_break_points(doc_lengths, cuts):
 
     # Preconditions
     assert isinstance(doc_lengths, list)
+    assert len(doc_lengths) > 0
     assert isinstance(cuts, list)
+    assert len(cuts) > 0
 
     c = np.cumsum(np.int64(doc_lengths))
 
