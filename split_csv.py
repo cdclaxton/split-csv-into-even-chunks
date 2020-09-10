@@ -172,7 +172,6 @@ def plot_doc_lengths(doc_lengths):
     plt.plot(doc_lengths)
     plt.xlabel("Row index")
     plt.ylabel("Number of characters")
-    # plt.show()
 
     plt.savefig("doc_lengths.png")
     plt.show()
