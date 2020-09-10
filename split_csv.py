@@ -51,21 +51,17 @@ def spacing_ratio(n):
     return [x/n for x in list(range(1, n))]
 
 
-def calc_break_points(doc_lengths, num_files):
+def calc_break_points(cum_doc_lengths, num_files):
     """Calculate breaks (row indicies) in the input file."""
 
     # Preconditions
     assert isinstance(doc_lengths, list)
     assert num_files > 1
 
-    # Cumulative sum of the document lengths
-    # Using int64 to avoid overflow issues
-    c = np.cumsum(np.int64(doc_lengths))
-
     # Total number of characters
-    total = c[-1]
+    total = cum_doc_lengths[-1]
 
-    return [np.argmin(abs(c - r*total)) for r in spacing_ratio(num_files)]
+    return [np.argmin(abs(cum_doc_lengths - r*total)) for r in spacing_ratio(num_files)]
 
 
 class BatchedCsvWriter:
@@ -167,7 +163,7 @@ def split(filepath, delimiter, encapsulator, output_folder, prefix, cuts):
 
 
 def plot_doc_lengths(doc_lengths):
-    """Plot the length of each document."""
+    """Plot the length of each document as a function of document index."""
 
     # Preconditions
     assert isinstance(doc_lengths, list)
@@ -176,11 +172,14 @@ def plot_doc_lengths(doc_lengths):
     plt.plot(doc_lengths)
     plt.xlabel("Document index")
     plt.ylabel("Number of characters")
+    # plt.show()
+
+    plt.savefig("doc_lengths.png")
     plt.show()
 
 
-def plot_break_points(doc_lengths, cuts):
-    """Plot the break points for the files."""
+def plot_break_points(cum_doc_lengths, cuts):
+    """Plot the break points for the files"""
 
     # Preconditions
     assert isinstance(doc_lengths, list)
@@ -188,15 +187,16 @@ def plot_break_points(doc_lengths, cuts):
     assert isinstance(cuts, list)
     assert len(cuts) > 0
 
-    c = np.cumsum(np.int64(doc_lengths))
-
-    plt.plot(c, '-g')
+    plt.plot(cum_doc_lengths, '-g')
 
     for cut in cuts:
-        plt.plot([0, len(c)], [c[cut], c[cut]], '--r')
+        plt.plot([0, len(cum_doc_lengths)], [
+                 cum_doc_lengths[cut], cum_doc_lengths[cut]], '--r')
 
     plt.xlabel("Document index")
     plt.ylabel("Cumulative total number of characters")
+
+    plt.savefig("break_points.png")
     plt.show()
 
 
@@ -221,9 +221,13 @@ if __name__ == '__main__':
     doc_lengths = calc_doc_lengths(filepath, delimiter, encapsulator)
     plot_doc_lengths(doc_lengths)
 
+    # Cumulative sum of the document lengths
+    # Using int64 to avoid overflow issues
+    cum_total = np.cumsum(np.int64(doc_lengths))
+
     # Calculate the 'break' indices
-    cuts = calc_break_points(doc_lengths, num_files)
-    plot_break_points(doc_lengths, cuts)
+    cuts = calc_break_points(cum_total, num_files)
+    plot_break_points(cum_total, cuts)
 
     # Split the CSV file
     split(filepath, delimiter, encapsulator, output_folder, prefix, cuts)
