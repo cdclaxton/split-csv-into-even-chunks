@@ -20,7 +20,7 @@ Two figures will be produced by the code. The first shows the number of characte
 
 ![](doc_lengths.png)
 
-The figure shows how the number of characters is either small (between 1 and 6) or large (between 100 and 120).
+The figure shows how the number of characters is either small (around 200) or large (around 4000).
 
 The second figure produced shows where the input file will be divided. The green line shows the cumulative total of the number of characters. The dashed red lines shows where the input CSV file will be divided. The even spacing is a visual indication that the algorithm has worked correctly.
 

@@ -170,7 +170,7 @@ def plot_doc_lengths(doc_lengths):
     assert len(doc_lengths) > 0
 
     plt.plot(doc_lengths)
-    plt.xlabel("Document index")
+    plt.xlabel("Row index")
     plt.ylabel("Number of characters")
     # plt.show()
 
@@ -193,7 +193,7 @@ def plot_break_points(cum_doc_lengths, cuts):
         plt.plot([0, len(cum_doc_lengths)], [
                  cum_doc_lengths[cut], cum_doc_lengths[cut]], '--r')
 
-    plt.xlabel("Document index")
+    plt.xlabel("Row index")
     plt.ylabel("Cumulative total number of characters")
 
     plt.savefig("break_points.png")
